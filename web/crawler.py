@@ -66,29 +66,41 @@ class Crawler(threading.Thread):
             with lock:
                 [(lambda url: Queue.get_instance().add(url))(url) for url in self.current_urls]
 
-            self.request(self.current_pos)
+            result = self.request(self.current_pos)
+
+            if not result["success"]:
+                self.die_reason = "ERROR: {} at {}".format(result["error"], self.current_pos)
+                break
             self.hop_count -= 1
 
         CrawlerAPI.get_instance().check_out(self.id)
-        print("Crawler {} died at {}  reason: {}".format(self.id, self.hop_count, self.die_reason))
+        print("Crawler {} died at hop {}  reason: {}".format(self.id, self.hop_count, self.die_reason))
 
     def filter(self):
         for i in range((len(self.current_urls) - 1) * -1, 0):
             if Crawler.invalid_url(self.current_urls[i]):
                 self.current_urls.pop(i)
 
-
     @staticmethod
     def invalid_url(url):
         split_url = url.split(":")
-        # print(split_url, not (split_url[0] == "https" or split_url[0] == "http"))
-
         return not (split_url[0] == "https" or split_url[0] == "http")
 
     def request(self, url):     # TODO handle 404
-        response = self.requester.exec_url(url)
+        try:
+            response = self.requester.exec_url(url)
+        except ConnectionRefusedError as err:
+            return {"success": False, "error": err}
+        except:
+            return {"success": False, "error": "unknown"}
+
+        if response is None:
+            return {"success": False, "error": "status code not 200"}
+
         self.parser.feed(str(response.content))
         self.current_content = self.parser.lsStartTags
+
+        return {"success": True, "error": None}
 
     def reproduce(self):
         if self.reproduced or self.reproduction_rate == 0:
@@ -114,4 +126,7 @@ class Crawler(threading.Thread):
 
         for tag in self.current_content:
             if tag.tag == "a":
-                self.current_urls.append(tag.attrs[0][1])   # [("href", url)]
+                try:
+                    self.current_urls.append(tag.attrs[0][1])   # [("href", url)]
+                except IndexError:
+                    continue

@@ -34,7 +34,7 @@ class Queue:
             return
         self.gattered_links.append(url)
 
-    def dump(self):     # TODO dump all when crawlers are done
+    def dump(self):
         with open(self.dump_file, "w" if self.overwrite else "a") as file:
             if not file.writable():
                 print("dump file not writable")  # TODO raise some exception

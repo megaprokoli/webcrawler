@@ -2,7 +2,7 @@ import requests
 from web.response_data import ResponseData
 
 
-class WebRequester:
+class WebRequester:     # TODO requests direct in classes
 
     def __init__(self):
         pass

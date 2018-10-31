@@ -91,7 +91,7 @@ class Crawler(threading.Thread):
         print("Crawler {} died at hop {}  reason: {}".format(self.id, self.hop_count, self.die_reason))
 
     def filter(self):
-        for i in range((len(self.current_urls) - 1) * -1, 0):
+        for i in range((len(self.current_urls) - 1) * -1, 0):   # backwards because pop while iterating
             if Crawler.invalid_url(self.current_urls[i]):
                 self.current_urls.pop(i)
 

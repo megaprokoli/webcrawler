@@ -42,5 +42,3 @@ class Queue:
 
             while self.has_next():
                 file.write(self.next() + self.dump_seperater)
-            # for url in self.gattered_links:
-                # file.write(url + self.dump_seperater)

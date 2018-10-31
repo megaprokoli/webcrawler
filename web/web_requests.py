@@ -11,6 +11,6 @@ class WebRequester:
         resp = requests.get(url)
 
         if resp.status_code != 200:
-            return None  # TODO rethink return None
+            return None
 
         return ResponseData(resp.encoding, resp.headers, resp.content)

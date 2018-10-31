@@ -1,4 +1,4 @@
-from constants import CONFIG
+from configuration import CONFIG
 
 
 class Queue:

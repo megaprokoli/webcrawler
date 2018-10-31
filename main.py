@@ -2,16 +2,17 @@ from url_handling.queue import Queue
 from web.web_requests import WebRequester
 from web.html_parser import HtmlParser
 from web.crawler import Crawler
-from constants import CONFIG
+import configuration
 from web.crawler_api import CrawlerAPI
 import time
 
 start_time = time.time()
 
-config = CONFIG
-queue = Queue.get_instance()
+configuration.initialize("res/config.ini")
 
-crawler = Crawler()
+queue = Queue.get_instance()
+crawler = Crawler(int(configuration.CONFIG.get("CRAWLER", "reproductionRate")))
+
 crawler.start()
 
 api = CrawlerAPI.get_instance()
@@ -20,5 +21,5 @@ while not api.all_done():
     pass
 
 queue.dump()
-print("DONE in {}".format(time.time() - start_time))    # 0.412994384765625
+print("DONE in {}".format(time.time() - start_time))
 

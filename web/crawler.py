@@ -4,13 +4,13 @@ from url_handling.queue import Queue
 from web.html_parser import HtmlParser
 from web.crawler_api import CrawlerAPI
 from web.web_requests import WebRequester
-from constants import CONFIG
+from configuration import CONFIG
 
 
 class Crawler(threading.Thread):
     id = 0
 
-    def __init__(self, reproduction_rate=int(CONFIG.get("CRAWLER", "reproductionRate"))):
+    def __init__(self, reproduction_rate):
         super().__init__()
 
         self.last_pos = None
@@ -29,6 +29,7 @@ class Crawler(threading.Thread):
         self.reproduction_rate = reproduction_rate
         self.per_page = int(CONFIG.get("CRAWLER", "reproductionPerPage"))
         self.hop_count = int(CONFIG.get("CRAWLER", "hopCount"))
+        self.retries = int(CONFIG.get("CRAWLER", "retries"))
 
         CrawlerAPI.get_instance().register(self)
 
@@ -48,9 +49,19 @@ class Crawler(threading.Thread):
             self.gather_links()
             self.filter()   # filter invalid urls
 
-            if len(self.current_urls) < 1:
+            if len(self.current_urls) < 1:  # TODO go to last pos
+                """
+                if self.retries > 0:
+                    next_url = self.last_pos
+                    self.last_pos = self.current_pos
+                    self.current_pos = next_url
+
+                    self.retries -= 1
+                    continue
+                """
+
                 self.die_reason = "no urls found"
-                break   # TODO go to last pos
+                break
 
             if self.reproduced:
                 next_url = self.current_urls[random.randint(0, len(self.current_urls) - 1)]
@@ -73,6 +84,9 @@ class Crawler(threading.Thread):
                 break
             self.hop_count -= 1
 
+        if self.hop_count <= 0:
+            self.die_reason = "done"
+
         CrawlerAPI.get_instance().check_out(self.id)
         print("Crawler {} died at hop {}  reason: {}".format(self.id, self.hop_count, self.die_reason))
 
@@ -86,7 +100,7 @@ class Crawler(threading.Thread):
         split_url = url.split(":")
         return not (split_url[0] == "https" or split_url[0] == "http")
 
-    def request(self, url):     # TODO handle 404
+    def request(self, url):
         try:
             response = self.requester.exec_url(url)
         except ConnectionRefusedError as err:

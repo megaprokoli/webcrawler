@@ -13,6 +13,15 @@ class CrawlerAPI:
 
         return CrawlerAPI.instance
 
+    def kill_all(self):
+        for crawler_id in self.crawler_map:
+            self.kill(crawler_id)
+
+    def kill(self, id):
+        crawler = self.crawler_map[id]
+        crawler.die_reason = "killed by user"
+        crawler.hop_count = 0
+
     def all_done(self):
         return len(self.crawler_map) == 0
 

@@ -37,8 +37,7 @@ class Queue:
     def dump(self):
         with open(self.dump_file, "w" if self.overwrite else "a") as file:
             if not file.writable():
-                print("dump file not writable")  # TODO raise some exception
-                return
+                raise Exception("dump file not writable")
 
             while self.has_next():
                 file.write(self.next() + self.dump_seperater)

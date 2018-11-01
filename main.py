@@ -17,8 +17,11 @@ crawler.start()
 
 api = CrawlerAPI.get_instance()
 
-while not api.all_done():
-    pass
+try:
+    while not api.all_done():
+        pass
+except KeyboardInterrupt:
+    api.kill_all()
 
 queue.dump()
 print("DONE in {}".format(time.time() - start_time))

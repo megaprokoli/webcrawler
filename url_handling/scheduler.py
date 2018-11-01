@@ -4,7 +4,7 @@ from url_handling.queue import Queue
 class Scheduler:
 
     def __init__(self):
-        workers = []
+        workers = list()
 
-    def __split_list(self):
+    def split_list(self):
         return []

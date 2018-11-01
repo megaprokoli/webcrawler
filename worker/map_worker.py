@@ -6,4 +6,5 @@ class MapWorker(QueueWorker):
         super().__init__(workload)
 
     def run(self):
-        pass
+        for url in self.workload:
+            print(url)

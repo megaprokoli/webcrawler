@@ -40,7 +40,7 @@ class Crawler(threading.Thread):
         self.current_pos = self.start_url
         self.request(self.start_url)
 
-        while self.hop_count >= 0:
+        while self.hop_count > 0:
 
             if self.no_robots():
                 self.die_reason = "no robots allowed"
@@ -97,6 +97,9 @@ class Crawler(threading.Thread):
 
     @staticmethod
     def invalid_url(url):
+        if url is None:
+            return False
+
         split_url = url.split(":")
         return not (split_url[0] == "https" or split_url[0] == "http")
 

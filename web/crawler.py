@@ -75,7 +75,7 @@ class Crawler(threading.Thread):
 
             # ADD URLs
             with lock:
-                [(lambda url: Queue.get_instance().add(url))(url) for url in self.current_urls]
+                [(lambda url: Queue.get_main_instance().add(url))(url) for url in self.current_urls]
 
             result = self.request(self.current_pos)
 

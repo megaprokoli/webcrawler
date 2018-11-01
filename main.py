@@ -10,7 +10,7 @@ start_time = time.time()
 
 configuration.initialize("res/config.ini")
 
-queue = Queue.get_instance()
+queue = Queue.get_main_instance()
 crawler = Crawler(int(configuration.CONFIG.get("CRAWLER", "reproductionRate")))
 
 crawler.start()

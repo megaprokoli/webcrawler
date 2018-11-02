@@ -1,14 +1,19 @@
 from url_handling.queue import Queue
-from configuration import CONFIG
+from configuration import CONFIG, WORKER_TYPE
 
 
 class Scheduler:
 
-    def __init__(self):
+    def __init__(self, worker_type):
         self.thread_count = int(CONFIG.get("WORKER", "threads"))
+        self.worker_type = worker_type
 
         self.workers = list()
         self.subqueues = list()
+
+    def start_workers(self):
+        for worker in self.workers:
+            worker.start()
 
     def create_workers(self):
         last_index = 0
@@ -23,7 +28,9 @@ class Scheduler:
 
         for i in range(0, self.thread_count):   # allocate equal pieces from url_list to the new workers
             chunk = last_index + subqueue_size
-            self.subqueues.append(Queue(url_list[last_index:chunk]))
+            self.workers.append(self.worker_type(Queue(url_list[last_index:chunk])))
             last_index = chunk
 
-        self.subqueues[-1].gathered_links += url_list[last_index:]  # fill the rest
+        self.workers[-1].workload.add(url_list[last_index:])   # fill the rest
+
+

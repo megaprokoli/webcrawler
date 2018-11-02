@@ -5,7 +5,7 @@ import configuration
 configuration.initialize("res/config.ini")
 
 queue = Queue.get_main_instance()
-scheduler = Scheduler()
+scheduler = Scheduler(configuration.WORKER_TYPE)
 
 for i in range(0, 15000):
     queue.add(str(i))
@@ -13,8 +13,4 @@ for i in range(0, 15000):
 # queue.read()
 scheduler.create_workers()
 
-print(len(queue.gathered_links))
-print(len(scheduler.subqueues))
-
-for sub in scheduler.subqueues:
-    print(len(sub.gathered_links), " ", sub.gathered_links)
+scheduler.start_workers()

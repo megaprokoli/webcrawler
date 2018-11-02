@@ -1,9 +1,8 @@
 import configparser
-from worker.map_worker import MapWorker
+from worker.test_worker import TestWorker
 
 __setups = {
-            "default": None,
-            "map": MapWorker
+            "test": TestWorker
             }
 
 CONFIG = configparser.ConfigParser()

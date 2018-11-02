@@ -1,13 +1,12 @@
 import random
 import threading
 from url_handling.queue import Queue
-from web.html_parser import HtmlParser
 from web.crawler_api import CrawlerAPI
-from web.web_requests import WebRequester
 from configuration import CONFIG
+from robot import Robot
 
 
-class Crawler(threading.Thread):
+class Crawler(Robot):
     id = 0
 
     def __init__(self, reproduction_rate):
@@ -15,11 +14,8 @@ class Crawler(threading.Thread):
 
         self.last_pos = None
         self.current_pos = None
-        self.current_content = list()
         self.current_urls = list()
-        self.parser = HtmlParser()
         self.reproduced = False
-        self.requester = WebRequester()
         self.die_reason = "unknown"
 
         self.id = Crawler.id
@@ -102,22 +98,6 @@ class Crawler(threading.Thread):
 
         split_url = url.split(":")
         return not (split_url[0] == "https" or split_url[0] == "http")
-
-    def request(self, url):
-        try:
-            response = self.requester.exec_url(url)
-        except ConnectionRefusedError as err:
-            return {"success": False, "error": err}
-        except:
-            return {"success": False, "error": "unknown"}
-
-        if response is None:
-            return {"success": False, "error": "status code not 200"}
-
-        self.parser.feed(str(response.content))
-        self.current_content = self.parser.lsStartTags
-
-        return {"success": True, "error": None}
 
     def reproduce(self):
         if self.reproduced or self.reproduction_rate == 0:

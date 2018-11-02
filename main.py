@@ -1,6 +1,4 @@
 from url_handling.queue import Queue
-from web.web_requests import WebRequester
-from web.html_parser import HtmlParser
 from web.crawler import Crawler
 import configuration
 from web.crawler_api import CrawlerAPI

@@ -3,7 +3,6 @@ from configuration import CONFIG
 
 class Queue:
     instance = None
-    id = 0  # TODO implement id
 
     def __init__(self, list=None):
         self.gathered_links = list if Queue.instance is not None else []   # FIFO

@@ -1,5 +1,5 @@
 from url_handling.queue import Queue
-from configuration import CONFIG, WORKER_TYPE
+from configuration import CONFIG
 
 
 class Scheduler:

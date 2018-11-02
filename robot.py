@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABC
-from web.response_data import ResponseData
 from web.html_parser import HtmlParser
 from threading import Thread
 import requests

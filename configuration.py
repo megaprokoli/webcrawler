@@ -1,8 +1,10 @@
 import configparser
 from worker.test_worker import TestWorker
+from worker.image_worker import ImageWorker
 
 __setups = {
-            "test": TestWorker
+            "test": TestWorker,
+            "img": ImageWorker
             }
 
 CONFIG = configparser.ConfigParser()

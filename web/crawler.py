@@ -9,7 +9,7 @@ from robot import Robot
 class Crawler(Robot):
     id = 0
 
-    def __init__(self, reproduction_rate):
+    def __init__(self, reproduction_rate, start_url=None):
         super().__init__()
 
         self.last_pos = None
@@ -21,11 +21,15 @@ class Crawler(Robot):
         self.id = Crawler.id
         Crawler.id += 1
 
-        self.start_url = CONFIG.get("CRAWLER", "startUrl")
         self.reproduction_rate = reproduction_rate
         self.per_page = int(CONFIG.get("CRAWLER", "reproductionPerPage"))
         self.hop_count = int(CONFIG.get("CRAWLER", "hopCount"))
         self.retries = int(CONFIG.get("CRAWLER", "retries"))
+
+        if start_url is None:
+            self.start_url = CONFIG.get("CRAWLER", "startUrl")
+        else:
+            self.start_url = start_url
 
         CrawlerAPI.get_instance().register(self)
 
@@ -34,7 +38,8 @@ class Crawler(Robot):
 
         lock = threading.Lock()
         self.current_pos = self.start_url
-        self.request(self.start_url)
+        self.request(self.start_url)    # TODO fix url=/ isnt filtered
+        self.filter()
 
         while self.hop_count > 0:
 
@@ -56,7 +61,7 @@ class Crawler(Robot):
                     continue
                 """
 
-                self.die_reason = "no urls found"
+                self.die_reason = "no urls found at {}".format(self.current_pos)
                 break
 
             if self.reproduced:
@@ -76,7 +81,7 @@ class Crawler(Robot):
             result = self.request(self.current_pos)
 
             if not result["success"]:
-                self.die_reason = "ERROR: {} at {}".format(result["error"], self.current_pos)
+                self.die_reason = "{} at {}".format(result["error"], self.current_pos)
                 break
             self.hop_count -= 1
 
@@ -88,16 +93,8 @@ class Crawler(Robot):
 
     def filter(self):
         for i in range((len(self.current_urls) - 1) * -1, 0):   # backwards because pop while iterating
-            if Crawler.invalid_url(self.current_urls[i]):
+            if Robot.invalid_url(self.current_urls[i]):
                 self.current_urls.pop(i)
-
-    @staticmethod
-    def invalid_url(url):
-        if url is None:
-            return False
-
-        split_url = url.split(":")
-        return not (split_url[0] == "https" or split_url[0] == "http")
 
     def reproduce(self):
         if self.reproduced or self.reproduction_rate == 0:
@@ -110,7 +107,8 @@ class Crawler(Robot):
 
         i = 0
         while i < counter:  # -1 so this crawler has an url
-            new_crawler = Crawler(reproduction_rate=self.reproduction_rate - 1)
+            new_crawler = Crawler(reproduction_rate=self.reproduction_rate - 1,
+                                  start_url=self.current_urls[i])
             new_crawler.start()
             i += 1
         self.reproduced = True

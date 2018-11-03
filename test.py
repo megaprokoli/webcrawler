@@ -25,5 +25,5 @@ hash = worker.hash_img(
     worker.request("https://upload.wikimedia.org/wikipedia/commons/a/a2/Prei_bloeiend_winter_Farinto.jpg")["response"].content)
 
 print(hash)
-print(Robot.invalid_url("/"))
+print(Robot.invalid_url("top"))
 
